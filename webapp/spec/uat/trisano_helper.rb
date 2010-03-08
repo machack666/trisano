@@ -223,9 +223,10 @@ module TrisanoHelper
     end
     browser.click 'link=ADMIN'
     browser.wait_for_page_to_load($load_time)
-    return(browser.is_text_present("Admin Dashboard"))
+    browser.is_text_present('Admin Dashboard').should be_true
+    true
   end
-  
+
   def edit_cmr(browser)
     browser.click "link=Edit"
     browser.wait_for_page_to_load($load_time)
@@ -330,7 +331,7 @@ module TrisanoHelper
   end
   
   def create_simplest_cmr(browser, last_name)
-    click_nav_new_cmr(browser)
+    click_nav_new_cmr(browser).should == true
     browser.type "morbidity_event_interested_party_attributes_person_entity_attributes_person_attributes_last_name", last_name
     yield browser if block_given?
     return save_cmr(browser)
@@ -804,23 +805,26 @@ module TrisanoHelper
     rescue
       result = false
     end
-    
+
     return (result == "true") ? true : false
   end
-  
+
   def add_question_to_element(browser, element_name, element_id_prefix, question_attributes, expect_error=false)
     element_id = get_form_element_id(browser, element_name, element_id_prefix)
     add_question_attributes(browser, element_id, question_attributes, expect_error)
   end
-  
+
   def add_question_to_core_field_config(browser, element_name, element_id_prefix, question_attributes)
     element_id = get_form_element_id_for_core_field(browser, element_name, element_id_prefix)
     add_question_attributes(browser, element_id, question_attributes)
   end
 
   def add_question_attributes(browser, element_id, question_attributes, expect_error=false)
+    browser.is_text_present("add-question-#{element_id}").should be_true
     browser.click("add-question-#{element_id}")
-    wait_for_element_present("new-question-form", browser)
+    #wait_for_element_present("new-question-form", browser)
+    wait_for_element_present("question_element_question_attributes_question_text", browser)
+    browser.is_element_present("question_element_question_attributes_question_text").should be_true
     fill_in_question_attributes(browser, question_attributes)
     browser.click "//input[contains(@id, 'create_question_submit')]"
 
@@ -888,7 +892,7 @@ module TrisanoHelper
     html_source = browser.get_html_source
     # Start from form_children to avoid finding something up in the top portion of the page
     name_position = html_source.index(name, html_source.index("form_children"))
-    
+
     begin
       id_start_position = html_source.rindex("#{element_id_prefix}", name_position) + element_prefix_length
       raise if html_source[id_start_position..id_start_position+1].to_i == 0

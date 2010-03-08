@@ -79,6 +79,8 @@ def add_a_section
   @browser.type "section_element_name", "Section 1"
   @browser.click "//input[contains(@id, 'create_section_submit')]"
   wait_for_element_not_present("new-section-form")
+  @browser.get_by_xpath("//td").each {|td| puts td.getTextContent}
+  @browser.is_element_present("//td[contains(text(),'Section 1')]").should be_true
   @browser.is_text_present("Section 1").should be_true
 
   @reorderable_section_id = "section_#{@browser.get_value("id=modified-element")}_children"
@@ -169,11 +171,11 @@ def add_and_populate_tab
 end
 
 def to_and_from_library_no_group
-  
   # Debt: This could be refactored to use the #add_question_to_library helper method
   @browser.click "link=Copy to library"
-  wait_for_element_present("new-group-form")
-  @browser.click "link=No Group"
+  wait_for_element_present("library-container")
+  @browser.is_element_present("//div[@id='library-container']//a[text() = 'No Group']").should be_true
+  @browser.click("//div[@id='library-container']//a[text() = 'No Group']")
   sleep(2)
   # Commenting out until UI settles down on library -- library functionality is checked in other tests
   # num_times_text_appears(@browser, @question_to_add_to_library_text).should == 2
@@ -181,11 +183,11 @@ def to_and_from_library_no_group
 
   @browser.click "link=Add question to tab"
   wait_for_element_present("new-question-form")
-  
+
   @browser.click("link=Show all groups")
   # Debt: If this UI sticks, add something to key off of instead of using this sleep
   sleep(2)
-    
+
   @browser.click "link=#{@question_to_add_to_library_text}"
   sleep(2)
   # Commenting out until UI settles down on library -- library functionality is checked in other tests
@@ -193,15 +195,15 @@ def to_and_from_library_no_group
 end
 
 def to_and_from_library_new_group
-  
+
   # Debt: This could be refactored to use the #add_question_to_library helper method
   add_question_to_view(@browser, "Default View", {:question_text => @question_to_add_to_library_text, :data_type => "Single line text", :short_name => get_random_word})
-  num_times_text_appears(@browser, @question_to_add_to_library_text).should == 1
+  @browser.get_by_xpath("//li[contains(@class, 'question')]").select {|li| li.get_text_content =~ /#{@question_to_add_to_library_text}/}.size.should == 1
   group_name = get_unique_name(3)
   @browser.click "link=Copy to library"
   wait_for_element_present("new-group-form")
   @browser.type "group_element_name", group_name
-  @browser.click "group_element_submit"    
+  @browser.click "group_element_submit"
   sleep(2)
   @browser.click "link=Add element to: #{group_name}"
   sleep(2)
@@ -210,7 +212,7 @@ def to_and_from_library_new_group
   @browser.click "link=Close"
 end
 
-def validate_investigator_rendering  
+def validate_investigator_rendering
   create_basic_investigatable_cmr(@browser, @cmr_last_name, "African Tick Bite Fever", "Bear River Health Department")
   edit_cmr(@browser)
   html_source = @browser.get_html_source

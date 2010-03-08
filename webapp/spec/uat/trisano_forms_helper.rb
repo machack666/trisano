@@ -72,17 +72,14 @@ module TrisanoFormsHelper
     browser.type "form_name", form_name
     browser.type "form_short_name", short_name || form_name
     browser.select "form_event_type", "label=#{type}"
-    if disease_label.respond_to?(:each)
-      disease_label.each { |label| browser.click(label.tr(" ", "_")) }
-    else
-      browser.click(disease_label.tr(" ", "_"))
+    [disease_label].flatten.compact.each do |label|
+      browser.click(label.tr(" ", "_"))
     end
     browser.select "form_jurisdiction_id", "label=#{jurisdiction_label}"
     browser.click "form_submit"
     browser.wait_for_page_to_load($load_time)
-    if browser.is_text_present("Form was successfully created.") != true
-      return(false)
-    end
+    browser.is_text_present("Form was successfully created.").should be_true
+
     sleep 3
     browser.click "link=Builder"
     browser.wait_for_page_to_load($load_time)

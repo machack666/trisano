@@ -18,7 +18,6 @@
 # You don't need to tweak the $LOAD_PATH if you have RSpec and Spec::Ui installed as gems
 $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../../../../rspec/lib')
 $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../../../lib')
-$:.unshift(File.dirname(__FILE__) + '/../../../../html_unit_rat/lib/')
 $load_time = ENV['TRISANO_PAGE_LOAD'] ||= '30000'
 $publish_time = ENV['TRISANO_PUBLISH'] ||= '60000'
 $rc_server = ENV['SEL_RC_SERVER'] ||= 'localhost'
@@ -32,8 +31,7 @@ require File.dirname(__FILE__) + '/trisano_contacts_helper'
 require File.dirname(__FILE__) + '/trisano_places_helper'
 require File.dirname(__FILE__) + '/trisano_admin_helper'
 require File.dirname(__FILE__) + '/trisano_forms_helper'
-
-require 'htmlunit_rat'
+require File.dirname(__FILE__) + '/../htmlunit'
 
 Spec::Runner.configure do |config|
   include TrisanoHelper

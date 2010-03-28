@@ -20,7 +20,7 @@ require File.dirname(__FILE__) + '/spec_helper'
 # $dont_kill_browser = true
 
 describe 'Form Builder Admin' do
-  
+
   before(:all) do
     @form_name = get_unique_name(4) + " fb uat"
 
@@ -29,14 +29,14 @@ describe 'Form Builder Admin' do
     @question_to_edit_text = "Can you describe the tick " + get_unique_name(4) + " fb uat" 
     @question_to_edit_modified_text = "Can you describe the tick edited " + get_unique_name(4) + " fb uat" 
     @question_to_inactivate_text = "Did you see the tick that got you " + get_unique_name(4) + " fb uat" 
-    
+
     @user_defined_tab_text = "User-defined tab " + get_unique_name(3) + " fb uat"
     @user_defined_tab_section_text = "User-defined tab section " + get_unique_name(3) + " fb uat"
     @user_defined_tab_question_text = "User-defined tab questoin " + get_unique_name(3) + " fb uat" 
-    
+
     @cmr_last_name = get_unique_name(1) + " fb uat"
   end
-  
+
   after(:all) do
     @form_name = nil
     @question_to_delete_text = nil
@@ -44,16 +44,15 @@ describe 'Form Builder Admin' do
     @question_to_edit_modified_text = nil
     @cmr_last_name = nil
   end
-  
+
   it 'should create a new form and allow navigation to builder' do
     create_new_form_and_go_to_builder(@browser, @form_name, "African Tick Bite Fever", "All Jurisdictions")
   end
-  
+
   # Debt: The remaining examples had to be combined into one in order to have access
   # to saved IDs across what used to be separate examples.
   # The methods provide some segmentation of all of the activities of the large example.
   it 'should do all this stuff...' do
-    
     to_and_from_library_new_group
     to_and_from_library_no_group
     add_a_section
@@ -79,30 +78,30 @@ def add_a_section
   @browser.type "section_element_name", "Section 1"
   @browser.click "//input[contains(@id, 'create_section_submit')]"
   wait_for_element_not_present("new-section-form")
-  @browser.get_by_xpath("//td").each {|td| puts td.getTextContent}
-  @browser.is_element_present("//td[contains(text(),'Section 1')]").should be_true
-  @browser.is_text_present("Section 1").should be_true
-
+  wait_for_element_present("//td[contains(text(), 'Section 1')]")
+  @browser.element_by_xpath("//td[contains(text(),'Section 1')]").should != nil
+  wait_for_element_present('modified-element')
   @reorderable_section_id = "section_#{@browser.get_value("id=modified-element")}_children"
 end
 
 def add_questions
   add_question_to_section(@browser, "Section 1", {:question_text => "Did you go into the tall grass?", :data_type => "Drop-down select list", :short_name => get_random_word})
   @browser.is_text_present("Did you go into the tall grass?").should be_true
-  
+
   add_question_to_section(@browser, "Section 1", {:question_text => @question_to_inactivate_text, :data_type => "Drop-down select list", :short_name => get_random_word})
   @browser.is_text_present(@question_to_inactivate_text).should be_true
-    
+
+  wait_for_element_present('modified-element')
   @question_to_inactivate_id = @browser.get_value("id=modified-element")
-  
+
   add_question_to_section(@browser, "Section 1", {:question_text => @question_to_delete_text, :data_type => "Multi-line text", :short_name => get_random_word})
   @browser.is_text_present(@question_to_delete_text).should be_true
-    
+
   @question_to_delete_id = @browser.get_value("id=modified-element")
-  
+
   add_question_to_section(@browser, "Section 1", {:question_text => @question_to_edit_text, :data_type => "Drop-down select list", :short_name => get_random_word})
   @browser.is_text_present(@question_to_edit_text).should be_true
-    
+
   @question_to_edit_id = @browser.get_value("id=modified-element")
 end
 
@@ -148,15 +147,15 @@ def edit_value_sets
 end
 
 def add_and_populate_tab
-  
+
   @browser.click("add-tab")
   wait_for_element_present("new-view-form")
   @browser.type "view_element_name", @user_defined_tab_text
   @browser.click "//input[contains(@id, 'create_view_submit')]"
   wait_for_element_not_present("new-view-form")
-  
+
   @tab_element_id = @browser.get_value("id=modified-element")
-  
+
   @browser.click "id=add-section-#{@tab_element_id}"
   wait_for_element_present("new-section-form")
   @browser.type "section_element_name", @user_defined_tab_section_text
@@ -176,7 +175,7 @@ def to_and_from_library_no_group
   wait_for_element_present("library-container")
   @browser.is_element_present("//div[@id='library-container']//a[text() = 'No Group']").should be_true
   @browser.click("//div[@id='library-container']//a[text() = 'No Group']")
-  sleep(2)
+  wait_for_link_present('Close')
   # Commenting out until UI settles down on library -- library functionality is checked in other tests
   # num_times_text_appears(@browser, @question_to_add_to_library_text).should == 2
   @browser.click "link=Close"
@@ -186,8 +185,8 @@ def to_and_from_library_no_group
 
   @browser.click("link=Show all groups")
   # Debt: If this UI sticks, add something to key off of instead of using this sleep
-  sleep(2)
 
+  wait_for_link_present(@question_to_add_to_library_text)
   @browser.click "link=#{@question_to_add_to_library_text}"
   sleep(2)
   # Commenting out until UI settles down on library -- library functionality is checked in other tests
@@ -204,9 +203,9 @@ def to_and_from_library_new_group
   wait_for_element_present("new-group-form")
   @browser.type "group_element_name", group_name
   @browser.click "group_element_submit"
-  sleep(2)
+  wait_for_link_present("Add element to: #{group_name}")
   @browser.click "link=Add element to: #{group_name}"
-  sleep(2)
+  wait_for_link_present('Close')
   # Commenting out until UI settles down on library -- library functionality is checked in other tests
   # num_times_text_appears(@browser, @question_to_add_to_library_text).should == 3
   @browser.click "link=Close"
@@ -240,7 +239,7 @@ def delete_edit_and_inactivate_questions
   wait_for_element_not_present("edit-question-form")
   @browser.is_text_present(@question_to_edit_text).should be_false
   @browser.is_text_present(@question_to_edit_modified_text).should be_true
-    
+
   @browser.click "id=edit-question-#{@question_to_inactivate_id}"
   wait_for_element_present("edit-question-form")
   @browser.click "question_element_is_active_false"

@@ -15,12 +15,20 @@
 # You should have received a copy of the GNU Affero General Public License 
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 
-module QuestionElementsHelper
+require File.dirname(__FILE__) + '/../spec_helper'
 
-  def options_for_question_data_type
-    Question.data_type_array.map do |text, value|
-      [text, value.to_sym]
-    end
+describe DiseasesHelper do
+  include HtmlSpecHelper
+
+  before(:all){ Disease.delete_all }
+  after(:all){ Fixtures.reset_cache }
+
+  it "#disease_check_boxes should style inactive diseases as inactive" do
+    d1 = Factory.create(:disease, :active => true)
+    d2 = Factory.create(:disease, :active => false)
+    results = parse_html(helper.disease_check_boxes('foo'))
+    results.xpath("//span[@class='inactive']").text.should == d2.disease_name
+    results.xpath("//span[text()='#{d1.disease_name}']").attribute('class').should == nil
   end
 
 end

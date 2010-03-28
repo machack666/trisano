@@ -2,20 +2,22 @@
 #
 # This file is part of TriSano.
 #
-# TriSano is free software: you can redistribute it and/or modify it under the 
-# terms of the GNU Affero General Public License as published by the 
-# Free Software Foundation, either version 3 of the License, 
+# TriSano is free software: you can redistribute it and/or modify it under the
+# terms of the GNU Affero General Public License as published by the
+# Free Software Foundation, either version 3 of the License,
 # or (at your option) any later version.
 #
-# TriSano is distributed in the hope that it will be useful, but 
-# WITHOUT ANY WARRANTY; without even the implied warranty of 
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+# TriSano is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
 #
-# You should have received a copy of the GNU Affero General Public License 
+# You should have received a copy of the GNU Affero General Public License
 # along with TriSano. If not, see http://www.gnu.org/licenses/agpl-3.0.txt.
 
 class PlacesController < ApplicationController
+
+  before_filter :init_search_form, :only => [:index]
 
   def index
     unless User.current_user.is_entitled_to?(:manage_entities)
@@ -23,7 +25,7 @@ class PlacesController < ApplicationController
     end
 
     unless params[:name].nil?
-      @place_entities = PlaceEntity.by_name_and_participation_type(params)
+      @place_entities = PlaceEntity.by_name_and_participation_type(@search_form)
     end
   end
 
@@ -88,4 +90,9 @@ class PlacesController < ApplicationController
     end
   end
 
+  private
+
+  def init_search_form
+    @search_form = PlacesSearchForm.new(params)
+  end
 end

@@ -1,0 +1,9 @@
+plugins:
+- trisano_locales
+- trisano_perinatal_hep_b
+- trisano_es
+- trisano_en
+- trisano_auth
+- authlogic
+
+cap_deploy: deployments/ce-demo1/deploy

@@ -22,7 +22,6 @@ class EncounterEvent < HumanEvent
     encounter.build_disease_event(parent_event.disease_event.attributes) unless parent_event.disease_event.nil?
     encounter.build_jurisdiction(parent_event.jurisdiction.attributes) unless parent_event.jurisdiction.nil?
     encounter.build_interested_party(parent_event.interested_party.attributes) unless parent_event.interested_party.nil?
-    encounter.build_disease_event(parent_event.disease_event.attributes) unless parent_event.disease_event.nil?
     encounter.add_note(I18n.translate("system_notes.encounter_event_created", :locale => I18n.default_locale))
   end
 
@@ -63,5 +62,8 @@ class EncounterEvent < HumanEvent
     unless base_errors.empty?
       base_errors.values.each { |msg| self.errors.add_to_base(msg) }
     end
+  end
+
+  def validate_associated_records_for_disease_event
   end
 end

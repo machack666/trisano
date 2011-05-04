@@ -21,6 +21,7 @@ describe CommonTestType do
   fixtures :external_codes
 
   before :all do
+    CoreFieldTranslation.delete_all
     CoreField.delete_all  # There's been fixutures spotted around these parts.
   end
 

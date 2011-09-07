@@ -11,12 +11,10 @@
   - person = person_entity.person
   - phone  = person_entity.primary_phone
   - contact_event_data = ParticipationsContact.find(contact.id)
-
   - if parent.deleted_at
     - style = {:class => 'struck-through'}
   - else
     - style = {}
-
   %tr
     %td{style}= h(person.last_comma_first)
     %td{style}= h(contact_event_data.disposition.code_description) if contact_event_data and contact_event_data.disposition
